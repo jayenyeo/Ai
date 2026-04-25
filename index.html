@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>의사결정 시뮬레이터</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 🎬 타이틀 -->
+<div id="titleScreen" class="center">
+  <h1 class="title">확률 기반 의사결정 게임</h1>
+
+  <div class="menu">
+    <button onclick="startGame()">연습</button>
+    <button onclick="startAIGame()">AI 배틀</button>
+    <button onclick="showRules()">룰 설명</button>
+  </div>
+</div>
+
+<!-- 📜 룰 -->
+<div id="ruleScreen" class="center" style="display:none;">
+  <h2>게임 규칙</h2>
+  <p>
+    • Hit 시 주사위 1~3개 랜덤<br>
+    • 같은 숫자 개수만큼 점수 배수 적용<br>
+    • 예: 2,2,1 → (5)×2 = 10점<br>
+    • 31 초과 시 즉시 패배<br>
+    • AI 모드: 3라운드 동안 승부
+  </p>
+  <button onclick="backToTitle()">뒤로가기</button>
+</div>
+
+<!-- 🎮 게임 -->
+<div id="gameScreen" class="center" style="display:none;">
+  <h2>Round: <span id="round">1</span></h2>
+  <h3 id="diceNow">이번 주사위: 🎲 1개</h3>
+  <h2>현재 점수: <span id="current">0</span></h2>
+
+  <div id="diceArea"></div>
+
+  <button onclick="hit()">Hit</button>
+  <button onclick="stop()">Stop</button>
+  <button onclick="goToTitle()">나가기</button>
+
+  <p id="result"></p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
