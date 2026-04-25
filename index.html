@@ -1,51 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>의사결정 시뮬레이터</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>확률 기반 의사결정 게임</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- 🎬 타이틀 -->
-<div id="titleScreen" class="center">
-  <h1 class="title">확률 기반 의사결정 게임</h1>
+<!-- 상단 마퀴 광고 -->
+<div class="marquee-bar">
+  <span>🔥 지금 바로 가입하면 100만원 보너스!! ★ 24시간 환전 가능 ★ 신규회원 특별혜택 ★ 지금 클릭!! 🔥 텍사스홀덤 바카라 슬롯 모두 가능!!</span>
+</div>
 
-  <div class="menu">
-    <button onclick="startGame()">연습</button>
-    <button onclick="startAIGame()">AI 배틀</button>
-    <button onclick="showRules()">룰 설명</button>
+<!-- 팝업 광고 1 -->
+<div class="popup-ad popup-1" id="popup1">
+  <span class="close-btn" onclick="document.getElementById('popup1').style.display='none'">×</span>
+  <div class="ad-title">🎰 축하합니다!</div>
+  <div class="ad-body">당신이 오늘의<br>행운의 당첨자!<br>지금 바로 수령하세요</div>
+  <button class="ad-btn">▶ 수령하기</button>
+</div>
+
+<!-- 팝업 광고 2 -->
+<div class="popup-ad popup-2" id="popup2">
+  <span class="close-btn" onclick="document.getElementById('popup2').style.display='none'">×</span>
+  <div class="ad-title">⚡ 긴급공지</div>
+  <div class="ad-body">오늘만 2배 이벤트<br>지금 접속 중 1,203명</div>
+  <button class="ad-btn">▶ 참여하기</button>
+</div>
+
+<!-- 팝업 광고 3 -->
+<div class="popup-ad popup-3" id="popup3">
+  <span class="close-btn" onclick="document.getElementById('popup3').style.display='none'">×</span>
+  <div class="ad-title">🏆 VIP 초대</div>
+  <div class="ad-body">특별회원 모집중</div>
+  <button class="ad-btn">▶ 가입</button>
+</div>
+
+<!-- 사이드 광고 좌측 -->
+<div class="side-ad-left">
+  <div class="side-ad-item">바카라</div>
+  <div class="side-ad-item">슬롯머신</div>
+  <div class="side-ad-item">포커</div>
+</div>
+
+<!-- 사이드 광고 우측 -->
+<div class="side-ad-right">
+  <div class="side-ad-item">실시간</div>
+  <div class="side-ad-item">베팅</div>
+  <div class="side-ad-item">VIP</div>
+</div>
+
+<!-- 메인 컨텐츠 -->
+<div class="main-wrapper">
+
+  <!-- ── 타이틀 화면 ── -->
+  <div id="titleScreen">
+    <div class="game-title">
+      <h1>확률 기반<br>의사결정 게임</h1>
+      <div class="subtitle">★ NEW ★ 지금 바로 플레이 ★</div>
+    </div>
+
+    <!-- 닉네임 입력 -->
+    <div class="nickname-box">
+      <label class="nick-label">닉네임 입력</label>
+      <input type="text" id="nicknameInput" class="nick-input" placeholder="이름을 입력하세요" maxlength="10">
+    </div>
+
+    <div class="divider"></div>
+    <div class="menu-buttons">
+      <button class="btn-main btn-practice" onclick="startGame()">▶ 연 습</button>
+      <button class="btn-main btn-ai" onclick="startAIGame()">🤖 AI 배틀</button>
+      <button class="btn-main btn-rank" onclick="showRanking()">🏆 랭킹</button>
+      <button class="btn-main btn-rules" onclick="showRules()">📋 룰 설명</button>
+    </div>
+    <div class="banner-ad">
+      <div class="ban-title">🎁 신규가입 이벤트 진행중! 🎁</div>
+      <div class="ban-body">지금 가입하면 포인트 1000P 즉시 지급 | 24시간 고객센터 운영</div>
+    </div>
+    <div class="divider"></div>
+    <div class="footer-note">본 게임은 학습용 시뮬레이터입니다</div>
   </div>
+
+  <!-- ── 룰 화면 ── -->
+  <div id="ruleScreen" style="display:none;">
+    <div class="rule-box">
+      <h2>◆ 게임 규칙 ◆</h2>
+      <p>
+        • Hit 시 주사위 1~3개 랜덤<br>
+        • 같은 숫자 개수만큼 점수 배수 적용<br>
+        • 예: 2,2,1 → (5)×2 = 10점<br>
+        • 31 초과 시 즉시 버스트 (해당 라운드 0점)<br>
+        • Stop 시 현재 점수가 총점에 누적<br>
+        • 3라운드 총점 합산이 최종 점수<br>
+        • AI 모드: 라운드별 승패 + 총점 기록
+      </p>
+    </div>
+    <button class="btn-back" onclick="backToTitle()">← 뒤로가기</button>
+  </div>
+
+  <!-- ── 랭킹 화면 ── -->
+  <div id="rankScreen" style="display:none;">
+    <div class="rank-box">
+      <h2>🏆 TOP 5 랭킹 🏆</h2>
+      <ul id="rankList" class="rank-list">
+        <li style="color:#ffff00;">불러오는 중...</li>
+      </ul>
+    </div>
+    <button class="btn-back" onclick="backToTitle()">← 뒤로가기</button>
+  </div>
+
+  <!-- ── 게임 화면 ── -->
+  <div id="gameScreen" style="display:none;">
+    <div class="game-header">
+      <div class="round-display">◆ ROUND <span id="round">1</span> / 3 ◆</div>
+      <div class="nick-display" id="nickDisplay"></div>
+    </div>
+
+    <div class="dice-preview" id="diceNow">이번 주사위: 🎲 1개</div>
+
+    <!-- 점수 표시 (현재 라운드 + 누적 총점) -->
+    <div class="score-row">
+      <div class="score-box">
+        <div class="score-label">이번 라운드</div>
+        <div class="score-value" id="current">0</div>
+      </div>
+      <div class="score-box score-box-total">
+        <div class="score-label">누적 총점</div>
+        <div class="score-value" id="total">0</div>
+      </div>
+    </div>
+
+    <div class="dice-area" id="diceArea"></div>
+
+    <div class="game-buttons">
+      <button class="btn-hit" onclick="hit()">HIT</button>
+      <button class="btn-stop" onclick="stop()">STOP</button>
+    </div>
+
+    <div class="result-box" id="result"></div>
+    <button class="btn-exit" onclick="goToTitle()">← 나가기</button>
+    <div style="padding-bottom: 60px;"></div>
+  </div>
+
 </div>
 
-<!-- 📜 룰 -->
-<div id="ruleScreen" class="center" style="display:none;">
-  <h2>게임 규칙</h2>
-  <p>
-    • Hit 시 주사위 1~3개 랜덤<br>
-    • 같은 숫자 개수만큼 점수 배수 적용<br>
-    • 예: 2,2,1 → (5)×2 = 10점<br>
-    • 31 초과 시 즉시 패배<br>
-    • AI 모드: 3라운드 동안 승부
-  </p>
-  <button onclick="backToTitle()">뒤로가기</button>
-</div>
-
-<!-- 🎮 게임 -->
-<div id="gameScreen" class="center" style="display:none;">
-  <h2>Round: <span id="round">1</span></h2>
-  <h3 id="diceNow">이번 주사위: 🎲 1개</h3>
-  <h2>현재 점수: <span id="current">0</span></h2>
-
-  <div id="diceArea"></div>
-
-  <button onclick="hit()">Hit</button>
-  <button onclick="stop()">Stop</button>
-  <button onclick="goToTitle()">나가기</button>
-
-  <p id="result"></p>
+<!-- 하단 고정 배너 -->
+<div class="bottom-bar">
+  <span>🔥 지금 접속중 4,521명</span>
+  <span>💎 오늘 당첨금 총 2억원</span>
+  <span>⚡ 긴급 이벤트 진행중</span>
+  <span>🎰 24시간 운영</span>
 </div>
 
 <script src="app.js"></script>
+<script>
+  // 닉네임 → 게임화면에 표시
+  function showGame() {
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("ruleScreen").style.display = "none";
+    document.getElementById("rankScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+    document.getElementById("nickDisplay").innerText = `👤 ${nickname}`;
+  }
+</script>
 </body>
 </html>
