@@ -1,5 +1,5 @@
 // ─── Google Apps Script 웹앱 URL (배포 후 여기에 붙여넣기) ───
-const SHEET_URL = "여기에_Apps_Script_웹앱_URL_붙여넣기";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwCAx7UbN2oRpfKojkP_rFeebZuI2aEK4OH3pW_M3m6-CAbsuO05n5yrNmY0lUBqKRl/exec";
 
 // ─── 게임 상태 ───
 let round = 1;
@@ -14,7 +14,25 @@ let nickname = "";
 
 // ─── 행동 데이터 로그 ───
 let actionLog = [];
+//--chatgpt에 의한 수정
+function logDecision(action) {
+  const entry = {
+    nickname: nickname,
+    mode: isAIMode ? "AI배틀" : "연습",
 
+    // 🔥 핵심 (선택 순간 상태)
+    decisionScore: currentScore,
+    decisionDiceCount: nextDiceCount,
+
+    action: action,
+    round: round,
+    totalScore: totalScore,
+
+    timestamp: new Date().toISOString()
+  };
+
+  sendToSheet(entry);
+}
 // ─── 시작 ───
 function startGame() {
   const nick = document.getElementById("nicknameInput").value.trim();
@@ -160,6 +178,9 @@ function sendToSheet(data) {
 // ─── HIT ───
 function hit() {
   if (gameOver) return;
+  // 🔥 이 줄 추가
+  logDecision("HIT");
+//
 
   animateDice((dice) => {
     let sum = dice.reduce((a, b) => a + b, 0);
@@ -206,6 +227,9 @@ function hit() {
 // ─── STOP ───
 function stop() {
   if (gameOver) return;
+  //chat gpt에 의한 수정
+  logDecision("STOP");
+  //
 
   // 이 라운드 점수 누적
   totalScore += currentScore;
