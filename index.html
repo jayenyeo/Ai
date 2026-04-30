@@ -8,15 +8,8 @@
 </head>
 <body>
 
-<!-- 상단 마퀴 광고 -->
-  </head>
-  <body>
-    
-  </body>
-  </html></title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!-- ✅ BGM 오디오 (반복재생) -->
+<audio id="bgm" src="bgm.mp3" loop autoplay></audio>
 
 <!-- 상단 마퀴 광고 -->
 <div class="marquee-bar">
@@ -31,20 +24,24 @@
   <button class="ad-btn">▶ 수령하기</button>
 </div>
 
-<!-- 팝업 광고 2 -->
+<!-- ✅ 팝업 광고 2 (긴급공지) - 참여하기 → https://jayenyeo.github.io/Test-form/ -->
 <div class="popup-ad popup-2" id="popup2">
   <span class="close-btn" onclick="document.getElementById('popup2').style.display='none'">×</span>
   <div class="ad-title">⚡ 긴급공지</div>
   <div class="ad-body">나에게 가장 잘 맞는 종목은?<br>지금 바로 확인하기</div>
-  <button class="ad-btn">▶ 참여하기</button>
+  <a href="https://jayenyeo.github.io/Test-form/" target="_blank" style="text-decoration:none;">
+    <button class="ad-btn">▶ 참여하기</button>
+  </a>
 </div>
 
-<!-- 팝업 광고 3 -->
+<!-- ✅ 팝업 광고 3 (지금 하면 강평업) - KEY → https://www.sdijbooks.com/main -->
 <div class="popup-ad popup-3" id="popup3">
   <span class="close-btn" onclick="document.getElementById('popup3').style.display='none'">×</span>
   <div class="ad-title">🏆 VIC league</div>
   <div class="ad-body">지금하면 바로 강평업!</div>
-  <button class="ad-btn">▶ KEY</button>
+  <a href="https://www.sdijbooks.com/main" target="_blank" style="text-decoration:none;">
+    <button class="ad-btn">▶ KEY</button>
+  </a>
 </div>
 
 <!-- 사이드 광고 좌측 -->
@@ -143,6 +140,9 @@
 
     <div class="dice-area" id="diceArea"></div>
 
+    <!-- ✅ 도훈봇 대사 표시 영역 -->
+    <div id="dohoonMsg" class="dohoon-msg" style="display:none;"></div>
+
     <div class="game-buttons">
       <button class="btn-hit" onclick="hit()">HIT</button>
       <button class="btn-stop" onclick="stop()">STOP</button>
@@ -155,16 +155,6 @@
 
 </div>
 
-<!-- 
-하단 고정 배너 
-<div class="bottom-bar">
-  <span>🔥 지금 접속중 4,521명</span>
-  <span>💎 오늘 당첨금 총 2억원</span>
-  <span>⚡ 긴급 이벤트 진행중</span>
-  <span>🎰 24시간 운영</span>
-</div> 
--->
-
 <script src="app.js"></script>
 <script>
   // 닉네임 → 게임화면에 표시
@@ -174,6 +164,29 @@
     document.getElementById("rankScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
     document.getElementById("nickDisplay").innerText = `👤 ${nickname}`;
+    // 게임 시작 시 도훈봇 메시지 숨기기
+    hideDohoonMsg();
+  }
+
+  // ✅ BGM 자동재생 (브라우저 정책상 첫 클릭 시 재생 시작)
+  document.addEventListener("click", function startBGM() {
+    const bgm = document.getElementById("bgm");
+    if (bgm.paused) {
+      bgm.play().catch(() => {});
+    }
+    document.removeEventListener("click", startBGM);
+  }, { once: true });
+
+  // ✅ 도훈봇 대사 표시 함수
+  function showDohoonMsg(msg) {
+    const el = document.getElementById("dohoonMsg");
+    el.style.display = "block";
+    el.innerText = `🤖 도훈봇 : ${msg}`;
+  }
+
+  function hideDohoonMsg() {
+    const el = document.getElementById("dohoonMsg");
+    if (el) el.style.display = "none";
   }
 </script>
 </body>

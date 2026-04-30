@@ -451,6 +451,27 @@ body::before {
   white-space: pre-line;
 }
 
+/* ✅ ───── 도훈봇 대사 ───── */
+.dohoon-msg {
+  background: linear-gradient(135deg, #000a33, #001a66);
+  border: 2px solid #00aaff;
+  border-left: 5px solid #00aaff;
+  padding: 10px 16px;
+  margin: 10px 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #00ccff;
+  text-shadow: 0 0 10px #00aaff, 0 0 20px #00aaff;
+  box-shadow: 0 0 18px #00aaff, inset 0 0 12px rgba(0,170,255,0.15);
+  letter-spacing: 2px;
+  text-align: center;
+  animation: dohoonPulse 1s ease-in-out infinite alternate;
+}
+@keyframes dohoonPulse {
+  from { box-shadow: 0 0 12px #00aaff; }
+  to   { box-shadow: 0 0 28px #00aaff, 0 0 50px #0055ff; }
+}
+
 /* ───── 하단 고정 배너 ───── */
 .bottom-bar {
   position: fixed;

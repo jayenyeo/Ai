@@ -14,25 +14,21 @@ let nickname = "";
 
 // ─── 행동 데이터 로그 ───
 let actionLog = [];
-//--chatgpt에 의한 수정
+
 function logDecision(action) {
   const entry = {
     nickname: nickname,
     mode: isAIMode ? "AI배틀" : "연습",
-
-    // 🔥 핵심 (선택 순간 상태)
     decisionScore: currentScore,
     decisionDiceCount: nextDiceCount,
-
     action: action,
     round: round,
     totalScore: totalScore,
-
     timestamp: new Date().toISOString()
   };
-
   sendToSheet(entry);
 }
+
 // ─── 시작 ───
 function startGame() {
   const nick = document.getElementById("nicknameInput").value.trim();
@@ -94,6 +90,7 @@ function reset() {
   aiWins = 0;
   actionLog = [];
   document.getElementById("total").innerText = 0;
+  if (typeof hideDohoonMsg === "function") hideDohoonMsg();
 }
 
 // ─── 주사위 개수 준비 ───
@@ -175,12 +172,22 @@ function sendToSheet(data) {
   }).catch(err => console.log("시트 전송 실패:", err));
 }
 
+// ✅ ─── 도훈봇 대사 표시 ───
+function showDohoonResult(playerWon) {
+  if (!isAIMode) return;
+  if (typeof showDohoonMsg === "function") {
+    if (playerWon) {
+      showDohoonMsg("좀 치네");      // 사용자 승리 시
+    } else {
+      showDohoonMsg("야르~");        // 사용자 패배 시
+    }
+  }
+}
+
 // ─── HIT ───
 function hit() {
   if (gameOver) return;
-  // 🔥 이 줄 추가
   logDecision("HIT");
-//
 
   animateDice((dice) => {
     let sum = dice.reduce((a, b) => a + b, 0);
@@ -191,7 +198,6 @@ function hit() {
     currentScore += finalScore;
 
     if (currentScore > 31) {
-      // 버스트 — 이 라운드 점수는 누적 안 됨
       logAction("HIT(버스트)", dice, currentScore);
 
       if (isAIMode) {
@@ -201,8 +207,11 @@ function hit() {
 
         if (round === 3) {
           gameOver = true;
-          let final = playerWins > aiWins ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 무승부";
+          let playerWon = playerWins > aiWins;
+          let final = playerWon ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 무승부";
           updateUI(`${msg}\n총점: ${totalScore} | (${playerWins}:${aiWins}) → ${final}`);
+          // ✅ 최종 결과에 따라 도훈봇 대사
+          showDohoonResult(playerWins > aiWins);
           sendFinalScore();
           return;
         }
@@ -227,14 +236,10 @@ function hit() {
 // ─── STOP ───
 function stop() {
   if (gameOver) return;
-  //chat gpt에 의한 수정
   logDecision("STOP");
-  //
 
-  // 이 라운드 점수 누적
   totalScore += currentScore;
   document.getElementById("total").innerText = totalScore;
-
   logAction("STOP", [], currentScore);
 
   if (isAIMode) {
@@ -246,8 +251,11 @@ function stop() {
 
     if (round === 3) {
       gameOver = true;
-      let final = playerWins > aiWins ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 최종 무승부";
+      let playerWon = playerWins > aiWins;
+      let final = playerWon ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 최종 무승부";
       updateUI(`AI: ${aiScore} → ${roundResult}\n총점: ${totalScore} | (${playerWins}:${aiWins}) → ${final}`);
+      // ✅ 최종 결과에 따라 도훈봇 대사
+      showDohoonResult(playerWins > aiWins);
       sendFinalScore();
       return;
     }
