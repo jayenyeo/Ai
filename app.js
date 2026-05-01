@@ -1,5 +1,5 @@
 // ─── Google Apps Script 웹앱 URL (배포 후 여기에 붙여넣기) ───
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwCAx7UbN2oRpfKojkP_rFeebZuI2aEK4OH3pW_M3m6-CAbsuO05n5yrNmY0lUBqKRl/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbw19MekAmwvpKQisOo4i1tlyTgc39ShCjK6-T-wMy6jPGhipkWukf7WYfUifkIbs4JyFg/exec";
 
 // ─── 게임 상태 ───
 let round = 1;
@@ -15,17 +15,28 @@ let nickname = "";
 // ─── 행동 데이터 로그 ───
 let actionLog = [];
 
-function logDecision(action) {
-  const entry = {
+// ─── 공통 시트 전송 데이터 빌더 (컬럼 순서 고정) ───
+// doPost 컬럼 순서: nickname(0), mode(1), decisionScore(2), decisionDiceCount(3),
+//                   action(4), round(5), totalScore(6), timestamp(7)
+function buildSheetEntry({ action, decisionScore = "", decisionDiceCount = "" } = {}) {
+  return {
     nickname: nickname,
     mode: isAIMode ? "AI배틀" : "연습",
-    decisionScore: currentScore,
-    decisionDiceCount: nextDiceCount,
+    decisionScore: decisionScore,
+    decisionDiceCount: decisionDiceCount,
     action: action,
     round: round,
     totalScore: totalScore,
     timestamp: new Date().toISOString()
   };
+}
+
+function logDecision(action) {
+  const entry = buildSheetEntry({
+    action: action,
+    decisionScore: currentScore,
+    decisionDiceCount: nextDiceCount
+  });
   sendToSheet(entry);
 }
 
@@ -39,6 +50,7 @@ function startGame() {
   showGame();
   prepareDice();
 }
+
 
 function startAIGame() {
   const nick = document.getElementById("nicknameInput").value.trim();
@@ -150,22 +162,30 @@ function aiTurn() {
 
 // ─── 행동 데이터 기록 & 전송 ───
 function logAction(action, dice, scoreAtAction) {
-  const entry = {
-    nickname: nickname,
-    mode: isAIMode ? "AI배틀" : "연습",
-    totalScore: totalScore,
-    round: round,
+  const entry = buildSheetEntry({
     action: action,
-    scoreAtAction: scoreAtAction,
-    diceCount: dice.length,
-    diceValues: dice.join(",")
+    decisionScore: scoreAtAction,
+    decisionDiceCount: dice.length !== undefined ? dice.length : ""
+  });
+  // 추가 메타정보는 별도 필드로 관리 (시트 컬럼에는 영향 없음)
+  const logEntry = {
+    ...entry,
+    diceValues: dice.length ? dice.join(",") : ""
   };
-  actionLog.push(entry);
-  sendToSheet(entry);
+  actionLog.push(logEntry);
+  sendToSheet(entry);  // 시트에는 컬럼 고정된 entry만 전송
 }
 
 function sendToSheet(data) {
   if (!SHEET_URL || SHEET_URL.includes("여기에")) return;
+
+  // ─── 클라이언트 측 점수 검증 (비정상 점수 차단) ───
+  const score = Number(data.totalScore);
+  if (isNaN(score) || score < 0 || score > 93) {
+    console.warn("비정상 점수 감지, 전송 차단:", data.totalScore);
+    return;
+  }
+
   fetch(SHEET_URL, {
     method: "POST",
     body: JSON.stringify(data)
@@ -198,7 +218,7 @@ function hit() {
     currentScore += finalScore;
 
     if (currentScore > 31) {
-      logAction("HIT(버스트)", dice, currentScore);
+      logAction("HIT(버스트)", dice, 0);  // 버스트는 0점 처리
 
       if (isAIMode) {
         let aiScore = aiTurn();
@@ -210,7 +230,6 @@ function hit() {
           let playerWon = playerWins > aiWins;
           let final = playerWon ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 무승부";
           updateUI(`${msg}\n총점: ${totalScore} | (${playerWins}:${aiWins}) → ${final}`);
-          // ✅ 최종 결과에 따라 도훈봇 대사
           showDohoonResult(playerWins > aiWins);
           sendFinalScore();
           return;
@@ -254,7 +273,6 @@ function stop() {
       let playerWon = playerWins > aiWins;
       let final = playerWon ? "🏆 최종 승리!" : playerWins < aiWins ? "❌ 최종 패배" : "🤝 최종 무승부";
       updateUI(`AI: ${aiScore} → ${roundResult}\n총점: ${totalScore} | (${playerWins}:${aiWins}) → ${final}`);
-      // ✅ 최종 결과에 따라 도훈봇 대사
       showDohoonResult(playerWins > aiWins);
       sendFinalScore();
       return;
@@ -276,16 +294,8 @@ function stop() {
 
 // ─── 최종 점수 시트 전송 ───
 function sendFinalScore() {
-  sendToSheet({
-    nickname: nickname,
-    mode: isAIMode ? "AI배틀" : "연습",
-    totalScore: totalScore,
-    round: "최종",
-    action: "FINAL",
-    scoreAtAction: totalScore,
-    diceCount: "",
-    diceValues: ""
-  });
+  const entry = buildSheetEntry({ action: "FINAL" });
+  sendToSheet(entry);
 }
 
 // ─── UI 업데이트 ───
